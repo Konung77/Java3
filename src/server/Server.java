@@ -5,10 +5,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author ilnaz-92@yandex.ru
- * Created on 2019-03-04
- */
 public class Server
 {
   private List<ClientHandler> clientHandlers = new ArrayList<>();
@@ -47,8 +43,6 @@ public class Server
         e.printStackTrace();
       }
     }
-
-
   }
 
   public void notificationAllClientWithNewMessage(String msg)
@@ -57,7 +51,6 @@ public class Server
     {
       clientHandler.sendMessage(msg);
     }
-
   }
 
   public void removeClient(ClientHandler clientHandler)
@@ -65,5 +58,15 @@ public class Server
     clientHandlers.remove(clientHandler);
   }
 
-
+  public boolean notificationClientByNickWithNewMessage(String nick, String msg)
+  {
+    for (ClientHandler clientHandler : clientHandlers)
+    {
+      if (clientHandler.getNickName() == nick) {
+        clientHandler.sendMessage(msg);
+        return true;
+      }
+    }
+    return false;
+  }
 }

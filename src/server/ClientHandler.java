@@ -4,10 +4,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 
-/**
- * @author ilnaz-92@yandex.ru
- * Created on 2019-03-04
- */
 public class ClientHandler implements Runnable
 {
   private Socket clientSocket;
@@ -15,7 +11,7 @@ public class ClientHandler implements Runnable
   private PrintWriter outMsg;
   private Scanner inMsg;
   private static int clientCount = 0;
-
+  private String nickName;
 
   public ClientHandler(Socket clientSocket, Server server)
   {
@@ -41,7 +37,6 @@ public class ClientHandler implements Runnable
       server.notificationAllClientWithNewMessage("New client in our chat");
       server.notificationAllClientWithNewMessage("Counts of clients in chat: " + clientCount);
 
-
     while (true)
       {
         if (inMsg.hasNext())
@@ -51,11 +46,20 @@ public class ClientHandler implements Runnable
           {
             break;
           }
-          System.out.println(clientMsg);
-          server.notificationAllClientWithNewMessage(clientMsg);
+          String[] words = clientMsg.split(" ",3);
+          if (words[0].equals("/w")) {
+            server.notificationClientByNickWithNewMessage(words[1], words[2]);
+            System.out.println(words[2]);
+          }
+//          else if (words[0].equals("/n")) {
+//              this.nickName = words[1];
+//        }
+          else {
+            System.out.println(clientMsg);
+            server.notificationAllClientWithNewMessage(clientMsg);
+          }
         }
       }
-
       Thread.sleep(1000);
     }
     catch (Exception e)
@@ -66,7 +70,6 @@ public class ClientHandler implements Runnable
     {
       exitFromChat();
     }
-
   }
 
   private void exitFromChat()
@@ -87,5 +90,15 @@ public class ClientHandler implements Runnable
     {
       e.printStackTrace();
     }
+  }
+
+  public String getNickName()
+  {
+    return nickName;
+  }
+
+  public void setNickName(String nickName)
+  {
+    this.nickName = nickName;
   }
 }
