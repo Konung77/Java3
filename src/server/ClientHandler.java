@@ -51,9 +51,9 @@ public class ClientHandler implements Runnable
             server.notificationClientByNickWithNewMessage(words[1], words[2]);
             System.out.println(words[2]);
           }
-          else if (words[0].equals("/n")) {
-              this.nickName = words[1];
-        }
+//          else if (words[0].equals("/n")) {
+//              this.nickName = words[1];
+//        }
           else {
             System.out.println(clientMsg);
             server.notificationAllClientWithNewMessage(clientMsg);

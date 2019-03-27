@@ -173,8 +173,7 @@ public class Client extends JFrame
 
   private void sendMsg(String message)
   {
-    String msg = message;
-    outMsg.println(msg);
+    outMsg.println(message);
     outMsg.flush();
   }
 

@@ -60,13 +60,13 @@ public class Server
 
   public boolean notificationClientByNickWithNewMessage(String nick, String msg)
   {
-      for (ClientHandler clientHandler : clientHandlers)
-        {
-            if (clientHandler.getNickName() == nick) {
-                clientHandler.sendMessage(msg);
-                return true;
-            }
-        }
-      return false;
+    for (ClientHandler clientHandler : clientHandlers)
+    {
+      if (clientHandler.getNickName() == nick) {
+        clientHandler.sendMessage(msg);
+        return true;
+      }
+    }
+    return false;
   }
 }
