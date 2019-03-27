@@ -1,7 +1,6 @@
 package client;
 
-import java.awt.BorderLayout;
-import java.awt.HeadlessException;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,13 +11,8 @@ import java.util.TimerTask;
 
 import javax.swing.*;
 
-/**
- * @author ilnaz-92@yandex.ru
- * Created on 2019-03-07
- */
 public class Client extends JFrame
 {
-
   private final String SERVER_HOST = "localhost";
   private final int SERVER_PORT = 8888;
   private Socket clientSocket;
@@ -27,6 +21,7 @@ public class Client extends JFrame
   private JTextField jtfMsg;
   private JTextField jtfName;
   private JTextArea jTextAreaMsg;
+  String nickName;
 
   public Client() throws HeadlessException
   {
@@ -66,7 +61,12 @@ public class Client extends JFrame
     jtfMsg = new JTextField("Please input your msg");
     bottomPanel.add(jtfMsg, BorderLayout.CENTER);
 
-    jtfName = new JTextField("Your name");
+    Scanner scanner = new Scanner(System.in);
+    System.out.println("Enter your nickname:");
+    nickName = scanner.nextLine().split(" ",2)[0];
+    sendMsg("/n "+ nickName);
+    //jtfName = new JTextField("Your name");
+    jtfName = new JTextField(nickName);
     bottomPanel.add(jtfName, BorderLayout.WEST);
 
     sendButton.addActionListener(new ActionListener()
@@ -81,7 +81,6 @@ public class Client extends JFrame
         {
           sendMsg();
           jtfMsg.grabFocus();
-
         }
       }
     });
@@ -109,7 +108,6 @@ public class Client extends JFrame
       @Override
       public void run()
       {
-
         while (true)
         {
           if (inMsg.hasNext())
@@ -125,7 +123,6 @@ public class Client extends JFrame
               jTextAreaMsg.append(msg);
               jTextAreaMsg.append("\n");
             }
-
           }
         }
       }
@@ -159,13 +156,11 @@ public class Client extends JFrame
         {
           e1.printStackTrace();
         }
-
-
       }
     });
     setVisible(true);
-    Timer timer = new Timer();
-    timer.schedule(testAnonym,120*1000);
+//    Timer timer = new Timer();
+//    timer.schedule(testAnonym,120*1000);
   }
 
   private void sendMsg()
@@ -176,11 +171,18 @@ public class Client extends JFrame
     jtfMsg.setText("");
   }
 
-  TimerTask testAnonym = new TimerTask() {
-      @Override
-      public void run() {
-          String clientName = jtfName.getText();
-          if (clientName.isEmpty() || clientName.equalsIgnoreCase("Your name")) dispose();
-      }
-  };
+  private void sendMsg(String message)
+  {
+    String msg = message;
+    outMsg.println(msg);
+    outMsg.flush();
+  }
+
+//  TimerTask testAnonym = new TimerTask() {
+//      @Override
+//      public void run() {
+//          String clientName = jtfName.getText();
+//          if (clientName.isEmpty() || clientName.equalsIgnoreCase("Your name")) dispose();
+//      }
+//  };
 }
