@@ -69,4 +69,9 @@ public class Server
     }
     return false;
   }
+
+  public void authenticationClient(ClientHandler clientHandler, String nickName)
+  {
+    clientHandler.setNickName(nickName);
+  }
 }
