@@ -12,6 +12,7 @@ public class ClientHandler implements Runnable
   private Scanner inMsg;
   private static int clientCount = 0;
   private String nickName;
+  private Authentication authentication;
 
   public ClientHandler(Socket clientSocket, Server server)
   {
@@ -34,33 +35,40 @@ public class ClientHandler implements Runnable
   {
     try
     {
-      server.notificationAllClientWithNewMessage("New client in our chat");
-      server.notificationAllClientWithNewMessage("Counts of clients in chat: " + clientCount);
+      authentication = new Authentication(this);
+      setNickName(authentication.auth());
+      if (nickName.isEmpty()) {
+        sendMessage("/q");
+        server.removeClient(this);
+      } else {
+        server.notificationAllClientWithNewMessage("New client in our chat: " + nickName);
+        server.notificationAllClientWithNewMessage("Counts of clients in chat: " + clientCount);
 
-    while (true)
-      {
-        if (inMsg.hasNext())
-        {
-          String clientMsg = inMsg.nextLine();
-          if (clientMsg.equalsIgnoreCase("QUIT"))
-          {
-            break;
-          }
-          String[] words = clientMsg.split(" ",3);
-          if (words[0].equals("/w")) {
-            server.notificationClientByNickWithNewMessage(words[1], words[2]);
-            System.out.println(words[2]);
-          }
-//          else if (words[0].equals("/n")) {
-//              this.nickName = words[1];
-//        }
-          else {
-            System.out.println(clientMsg);
-            server.notificationAllClientWithNewMessage(clientMsg);
+        while (true) {
+          if (inMsg.hasNext()) {
+            String clientMsg = inMsg.nextLine();
+//            if (clientMsg.equalsIgnoreCase("QUIT")) {
+//              break;
+//            }
+            if (clientMsg.startsWith("/")) {
+              String[] words = clientMsg.split(" ", 3);
+              if (words[0].equals("/w")) {
+                server.notificationClientByNickWithNewMessage(words[1], words[2]);
+                System.out.println(words[2]);
+              } else if (words[0].equals("/n")) {
+                updateNickName(words[1]);
+              } else if (words[0].equals("/q")) {
+                sendMessage("/q");
+                server.removeClient(this);
+              }
+            } else {
+              System.out.println(nickName + ":" + clientMsg);
+              server.notificationAllClientWithNewMessage(clientMsg);
+            }
           }
         }
+//        Thread.sleep(1000);
       }
-      Thread.sleep(1000);
     }
     catch (Exception e)
     {
@@ -100,5 +108,28 @@ public class ClientHandler implements Runnable
   public void setNickName(String nickName)
   {
     this.nickName = nickName;
+    sendMessage("/n "+nickName);
   }
+
+  public void updateNickName(String nickName)
+  {
+    if (authentication.update(nickName)) {
+      this.nickName = nickName;
+      sendMessage("/n " + nickName);
+    }
+  }
+
+  public String getAnswer()
+  {
+    return inMsg.nextLine();
+  }
+
+//  public void init()
+//  {
+//    sendMessage("Введите никнейм");
+//    nickName = inMsg.nextLine();
+//    sendMessage("Введите пароль");
+//    String psssword = inMsg.nextLine().split(":",2)[1];
+//    server.authenticationClient(this, nickName);
+//  }
 }

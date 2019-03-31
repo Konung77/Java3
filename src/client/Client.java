@@ -19,7 +19,7 @@ public class Client extends JFrame
   private Scanner inMsg;
   private PrintWriter outMsg;
   private JTextField jtfMsg;
-  private JTextField jtfName;
+  private JLabel lblName;
   private JTextArea jTextAreaMsg;
   String nickName;
 
@@ -58,16 +58,34 @@ public class Client extends JFrame
     JButton sendButton = new JButton("SEND");
     bottomPanel.add(sendButton, BorderLayout.EAST);
 
-    jtfMsg = new JTextField("Please input your msg");
+    jtfMsg = new JTextField();//"Please input your msg");
     bottomPanel.add(jtfMsg, BorderLayout.CENTER);
 
-    Scanner scanner = new Scanner(System.in);
-    System.out.println("Enter your nickname:");
-    nickName = scanner.nextLine().split(" ",2)[0];
-    sendMsg("/n "+ nickName);
-    //jtfName = new JTextField("Your name");
-    jtfName = new JTextField(nickName);
-    bottomPanel.add(jtfName, BorderLayout.WEST);
+//    Scanner scanner = new Scanner(System.in);
+//    System.out.println("Enter your nickname:");
+//    nickName = scanner.nextLine().split(" ",2)[0];
+//    sendMsg("/n "+ nickName);
+    lblName = new JLabel("Noname");
+    //jtfName = new JTextField(nickName);
+    bottomPanel.add(lblName, BorderLayout.WEST);
+
+    jtfMsg.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        super.keyPressed(e);
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+          String msg = jtfMsg.getText().trim();
+//          String name = lblName.getText().trim();
+
+//          if (!msg.isEmpty() && !name.isEmpty())
+          if (!msg.isEmpty())
+          {
+            sendMsg();
+            jtfMsg.grabFocus();
+          }
+        }
+      }
+    });
 
     sendButton.addActionListener(new ActionListener()
     {
@@ -75,9 +93,9 @@ public class Client extends JFrame
       public void actionPerformed(ActionEvent e)
       {
         String msg = jtfMsg.getText().trim();
-        String name = jtfName.getText().trim();
 
-        if (!msg.isEmpty() && !name.isEmpty())
+//        if (!msg.isEmpty() && !name.isEmpty())
+        if (!msg.isEmpty())
         {
           sendMsg();
           jtfMsg.grabFocus();
@@ -94,14 +112,14 @@ public class Client extends JFrame
       }
     });
 
-    jtfName.addFocusListener(new FocusAdapter()
-    {
-      @Override
-      public void focusGained(FocusEvent e)
-      {
-        jtfName.setText("");
-      }
-    });
+//    jtfName.addFocusListener(new FocusAdapter()
+//    {
+//      @Override
+//      public void focusGained(FocusEvent e)
+//      {
+//        jtfName.setText("");
+//      }
+//    });
 
     new Thread(new Runnable()
     {
@@ -113,15 +131,31 @@ public class Client extends JFrame
           if (inMsg.hasNext())
           {
             String msg = inMsg.nextLine();
-            String clientInChat = "Counts of clients in chat: ";
+            String clientInChat = "Count of clients in chat: ";
             if (msg.indexOf(clientInChat) == 0)
             {
               labelCountOfClient.setText(msg);
             }
             else
             {
-              jTextAreaMsg.append(msg);
-              jTextAreaMsg.append("\n");
+              // Команды сервера
+              if (msg.startsWith("/")) {
+                String[] words = msg.split(" ",3);
+                if (words[0].equals("/n")) {
+                  nickName = words[1];
+                  lblName.setText(nickName);
+                }
+                else if (words[0].equals("/q")) {
+                  //disableEvents(new WindowEvent());
+                  dispose();
+                  return;
+                }
+              }
+              // Данные
+              else {
+                jTextAreaMsg.append(msg);
+                jTextAreaMsg.append("\n");
+              }
             }
           }
         }
@@ -134,15 +168,15 @@ public class Client extends JFrame
       public void windowClosing(WindowEvent e)
       {
         super.windowClosing(e);
-        String clientName = jtfName.getText();
-        if (!clientName.isEmpty() && !clientName.equalsIgnoreCase("Your name"))
-        {
-          outMsg.println(clientName + " exited from chat.");
-        }
-        else
-        {
-          outMsg.println("Anonnym client exited from our chat");
-        }
+//        String clientName = jtfName.getText();
+//        if (!clientName.isEmpty() && !clientName.equalsIgnoreCase("Your name"))
+//        {
+          outMsg.println(nickName + " exited from chat.");
+//        }
+//        else
+//        {
+//          outMsg.println("Anonymous client exited from our chat");
+//        }
 
         outMsg.println("QUIT");
         outMsg.flush();
@@ -159,22 +193,32 @@ public class Client extends JFrame
       }
     });
     setVisible(true);
+    jtfMsg.grabFocus();
+    init();
 //    Timer timer = new Timer();
 //    timer.schedule(testAnonym,120*1000);
   }
 
   private void sendMsg()
   {
-    String msg = jtfName.getText() + ":" + jtfMsg.getText();
-    outMsg.println(msg);
+//    String msg;
+//    String msg = jtfName.getText() + ":" + jtfMsg.getText();
+//    if (jtfMsg.getText().startsWith("/"))
+//    msg = jtfMsg.getText();
+//    else msg = nickName + ":" + jtfMsg.getText();
+    outMsg.println(jtfMsg.getText());
     outMsg.flush();
     jtfMsg.setText("");
   }
 
-  private void sendMsg(String message)
-  {
-    outMsg.println(message);
-    outMsg.flush();
+//  private void sendMsg(String message)
+//  {
+//    outMsg.println(message);
+//    outMsg.flush();
+//  }
+
+  private void init() {
+    System.out.println("Init...");
   }
 
 //  TimerTask testAnonym = new TimerTask() {
