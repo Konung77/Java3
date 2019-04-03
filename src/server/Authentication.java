@@ -20,7 +20,6 @@ public class Authentication {
     }
 
     public String auth () throws Exception {
-//        Scanner scanner = new Scanner(System.in);
         ResultSet rs = null;
 
         client.sendMessage("Нажмите 1, если у Вас уже есть логин, или 2, если Вы хотите зарегистрироваться");
@@ -59,7 +58,7 @@ public class Authentication {
             e.printStackTrace();
             return "";
         } finally {
-//            return "";
+            client.sendMessage("/a");
         }
     }
 

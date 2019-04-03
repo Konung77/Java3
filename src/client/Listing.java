@@ -8,7 +8,7 @@ public class Listing {
 
     public Listing(String fileName) {
         this.fileName = fileName;
-        file = new File("list.txt");
+        file = new File(fileName);
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -33,12 +33,20 @@ public class Listing {
     // Метод запускается после авторизации клиента в чате
     String read ()
     {
+        int current_line = 0;
         String buffer = "";
+
         try (BufferedReader reader = new BufferedReader(new FileReader(fileName)))
         {
             String str;
-            while ((str = reader.readLine()) != null)
-            buffer += str+"\n";
+            while ((str = reader.readLine()) != null) {
+                if (current_line < 100) buffer += str+"\n";
+                else {
+                    String[] temp = buffer.split("\n",2);
+                    buffer = temp[1] + str + "\n";
+                }
+                current_line++;
+            }
         }
         catch (IOException e) {
             e.printStackTrace();

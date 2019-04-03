@@ -39,17 +39,15 @@ public class ClientHandler implements Runnable
       setNickName(authentication.auth());
       if (nickName.isEmpty()) {
         sendMessage("/q");
-        server.removeClient(this);
+        exitFromChat();
+//        server.removeClient(this);
       } else {
         server.notificationAllClientWithNewMessage("New client in our chat: " + nickName);
-        server.notificationAllClientWithNewMessage("Counts of clients in chat: " + clientCount);
+        server.notificationAllClientWithNewMessage("Count of clients in chat: " + clientCount);
 
         while (true) {
           if (inMsg.hasNext()) {
             String clientMsg = inMsg.nextLine();
-//            if (clientMsg.equalsIgnoreCase("QUIT")) {
-//              break;
-//            }
             if (clientMsg.startsWith("/")) {
               String[] words = clientMsg.split(" ", 3);
               if (words[0].equals("/w")) {
@@ -59,11 +57,12 @@ public class ClientHandler implements Runnable
                 updateNickName(words[1]);
               } else if (words[0].equals("/q")) {
                 sendMessage("/q");
-                server.removeClient(this);
+                exitFromChat();
               }
             } else {
-              System.out.println(nickName + ":" + clientMsg);
-              server.notificationAllClientWithNewMessage(clientMsg);
+              String msg = nickName + ":" + clientMsg;
+              System.out.println(msg);
+              server.notificationAllClientWithNewMessage(msg);
             }
           }
         }
@@ -83,7 +82,8 @@ public class ClientHandler implements Runnable
   private void exitFromChat()
   {
     clientCount--;
-    server.notificationAllClientWithNewMessage("Client exited. In out chat = " + clientCount + " clients!");
+    server.notificationAllClientWithNewMessage("Client exited. In our chat are " + clientCount + " clients!");
+    server.notificationAllClientWithNewMessage("Count of clients in chat: " + clientCount);
     server.removeClient(this);
   }
 
@@ -123,13 +123,4 @@ public class ClientHandler implements Runnable
   {
     return inMsg.nextLine();
   }
-
-//  public void init()
-//  {
-//    sendMessage("Введите никнейм");
-//    nickName = inMsg.nextLine();
-//    sendMessage("Введите пароль");
-//    String psssword = inMsg.nextLine().split(":",2)[1];
-//    server.authenticationClient(this, nickName);
-//  }
 }
