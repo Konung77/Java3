@@ -10,6 +10,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 public class Client extends JFrame
 {
@@ -21,7 +22,8 @@ public class Client extends JFrame
   private JTextField jtfMsg;
   private JLabel lblName;
   private JTextArea jTextAreaMsg;
-  String nickName;
+  private String nickName;
+  private Listing listFile = new Listing("list.txt");
 
   public Client() throws HeadlessException
   {
@@ -42,6 +44,9 @@ public class Client extends JFrame
     jTextAreaMsg = new JTextArea();
     jTextAreaMsg.setEditable(false);
     jTextAreaMsg.setLineWrap(true);
+    // Добавляем свойство автоскроллирования в область сообщений
+    DefaultCaret caret = (DefaultCaret)jTextAreaMsg.getCaret();
+    caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
     JScrollPane jScrollPane = new JScrollPane(jTextAreaMsg);
     add(jScrollPane, BorderLayout.CENTER);
@@ -52,21 +57,13 @@ public class Client extends JFrame
     JPanel bottomPanel = new JPanel(new BorderLayout());
     add(bottomPanel, BorderLayout.SOUTH);
 
-//    JLabel countsOfClientLabel = new JLabel("Counts of clients in chat :");
-//    add(countsOfClientLabel, BorderLayout.NORTH);
-
     JButton sendButton = new JButton("SEND");
     bottomPanel.add(sendButton, BorderLayout.EAST);
 
-    jtfMsg = new JTextField();//"Please input your msg");
+    jtfMsg = new JTextField();
     bottomPanel.add(jtfMsg, BorderLayout.CENTER);
 
-//    Scanner scanner = new Scanner(System.in);
-//    System.out.println("Enter your nickname:");
-//    nickName = scanner.nextLine().split(" ",2)[0];
-//    sendMsg("/n "+ nickName);
     lblName = new JLabel("Noname");
-    //jtfName = new JTextField(nickName);
     bottomPanel.add(lblName, BorderLayout.WEST);
 
     jtfMsg.addKeyListener(new KeyAdapter() {
@@ -75,9 +72,7 @@ public class Client extends JFrame
         super.keyPressed(e);
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
           String msg = jtfMsg.getText().trim();
-//          String name = lblName.getText().trim();
 
-//          if (!msg.isEmpty() && !name.isEmpty())
           if (!msg.isEmpty())
           {
             sendMsg();
@@ -94,7 +89,6 @@ public class Client extends JFrame
       {
         String msg = jtfMsg.getText().trim();
 
-//        if (!msg.isEmpty() && !name.isEmpty())
         if (!msg.isEmpty())
         {
           sendMsg();
@@ -111,15 +105,6 @@ public class Client extends JFrame
         jtfMsg.setText("");
       }
     });
-
-//    jtfName.addFocusListener(new FocusAdapter()
-//    {
-//      @Override
-//      public void focusGained(FocusEvent e)
-//      {
-//        jtfName.setText("");
-//      }
-//    });
 
     new Thread(new Runnable()
     {
@@ -146,9 +131,15 @@ public class Client extends JFrame
                   lblName.setText(nickName);
                 }
                 else if (words[0].equals("/q")) {
-                  //disableEvents(new WindowEvent());
+                  destroy();
                   dispose();
                   return;
+                }
+                else if (words[0].equals("/clr")) {
+                    jTextAreaMsg.setText("");
+                }
+                else if (words[0].equals("/a")) {
+                    jTextAreaMsg.setText(listFile.read());
                 }
               }
               // Данные
@@ -168,64 +159,40 @@ public class Client extends JFrame
       public void windowClosing(WindowEvent e)
       {
         super.windowClosing(e);
-//        String clientName = jtfName.getText();
-//        if (!clientName.isEmpty() && !clientName.equalsIgnoreCase("Your name"))
-//        {
           outMsg.println(nickName + " exited from chat.");
-//        }
-//        else
-//        {
-//          outMsg.println("Anonymous client exited from our chat");
-//        }
-
-        outMsg.println("QUIT");
-        outMsg.flush();
-        outMsg.close();
-        inMsg.close();
-        try
-        {
-          clientSocket.close();
-        }
-        catch (IOException e1)
-        {
-          e1.printStackTrace();
-        }
+        destroy();
       }
     });
     setVisible(true);
     jtfMsg.grabFocus();
-    init();
-//    Timer timer = new Timer();
-//    timer.schedule(testAnonym,120*1000);
+//    init();
   }
 
   private void sendMsg()
   {
-//    String msg;
-//    String msg = jtfName.getText() + ":" + jtfMsg.getText();
-//    if (jtfMsg.getText().startsWith("/"))
-//    msg = jtfMsg.getText();
-//    else msg = nickName + ":" + jtfMsg.getText();
     outMsg.println(jtfMsg.getText());
     outMsg.flush();
     jtfMsg.setText("");
   }
 
-//  private void sendMsg(String message)
-//  {
-//    outMsg.println(message);
-//    outMsg.flush();
+//  private void init() {
+//    System.out.println("Init...");
 //  }
 
-  private void init() {
-    System.out.println("Init...");
-  }
-
-//  TimerTask testAnonym = new TimerTask() {
-//      @Override
-//      public void run() {
-//          String clientName = jtfName.getText();
-//          if (clientName.isEmpty() || clientName.equalsIgnoreCase("Your name")) dispose();
-//      }
-//  };
+    void destroy()
+    {
+        listFile.write(jTextAreaMsg.getText());
+//        outMsg.println("QUIT");
+        outMsg.flush();
+        outMsg.close();
+        inMsg.close();
+        try
+        {
+            clientSocket.close();
+        }
+        catch (IOException e1)
+        {
+            e1.printStackTrace();
+        }
+    }
 }
