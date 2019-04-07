@@ -4,6 +4,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Server
 {
@@ -13,17 +15,21 @@ public class Server
   {
     ServerSocket serverSocket = null;
     Socket clientSocket = null;
+    ExecutorService executorService = null;
+
     try
     {
       serverSocket = new ServerSocket(8888);
       System.out.println("Server launched");
+      executorService = Executors.newFixedThreadPool(2);
 
       while (true)
       {
         clientSocket = serverSocket.accept();
         ClientHandler client = new ClientHandler(clientSocket, this);
+        // ClientHandler объявлен как public class ClientHandler implements Runnable
+        executorService.execute(client);
         clientHandlers.add(client);
-        new Thread(client).start();
       }
     }
     catch (Exception e)
@@ -34,6 +40,7 @@ public class Server
     {
       try
       {
+        executorService.shutdown();
         serverSocket.close();
         clientSocket.close();
         System.out.println("Server finished");
