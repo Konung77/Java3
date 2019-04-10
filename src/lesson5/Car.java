@@ -39,7 +39,6 @@ public class Car implements Runnable {
         try {
             System.out.println(this.name + " готовится");
             Thread.sleep(500 + (int)(Math.random() * 800));
-            MainClass.ready = true;
             System.out.println(this.name + " готов");
             readyCount++;
             if (readyCount == CARS_COUNT) System.out.println("ВАЖНОЕ ОБЪЯВЛЕНИЕ >>> Гонка началась!!!");
