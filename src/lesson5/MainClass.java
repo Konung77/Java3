@@ -12,7 +12,7 @@ public class MainClass {
         Car[] cars = new Car[CARS_COUNT];
         cb = new CyclicBarrier(CARS_COUNT);
         for (int i = 0; i < cars.length; i++) {
-            cars[i] = new Car(race, 20 + (int) (Math.random() * 10), CARS_COUNT);
+            cars[i] = new Car(race, 20 + (int) (Math.random() * 10));
         }
         for (int i = 0; i < cars.length; i++) {
             new Thread(cars[i]).start();

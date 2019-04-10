@@ -27,7 +27,7 @@ public class Car implements Runnable {
         return speed;
     }
 
-    public Car(Race race, int speed, int mcCarsCount) {
+    public Car(Race race, int speed) {
         this.race = race;
         this.speed = speed;
         CARS_COUNT++;
